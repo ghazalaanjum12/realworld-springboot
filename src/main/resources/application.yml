@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: conduit
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+  datasource:
+    url: jdbc:mysql://localhost:3307/realworld_db
+    username: realworld_user
+    password: realworld_pass
+    driver-class-name: com.mysql.cj.jdbc.Driver
