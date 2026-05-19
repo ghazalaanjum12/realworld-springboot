@@ -6,9 +6,20 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
+    open-in-view: false
 
   datasource:
     url: jdbc:mysql://localhost:3307/realworld_db
     username: realworld_user
     password: realworld_pass
     driver-class-name: com.mysql.cj.jdbc.Driver
+
+logging:
+  level:
+    org.springframework.security: DEBUG
+    org.springframework.web: DEBUG
+
+security:
+  jwt:
+    secret-key: Z0T4My41pvlKdselrdZakXs5ka/vXeJVrJhPYGldFiA=
+    expiration-time: 3600000
