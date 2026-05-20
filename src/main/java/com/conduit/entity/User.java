@@ -25,7 +25,7 @@ public class User implements UserDetails {
     @Column(name = "password", nullable = false)
     private String hashPassword;
     @Column(name = "username", nullable = false, unique = true)
-    private String username;
+    private String handle;
     @Column(name = "bio")
     public String bio;
     @Column(name = "image_url")

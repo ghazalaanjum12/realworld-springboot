@@ -13,10 +13,12 @@ public interface UserMapper {
     @Mapping(target = "bio", ignore = true)
     @Mapping(target = "imageUrl", ignore = true)
     @Mapping(target = "id", ignore = true)
+    @Mapping(target = "handle", source = "username")
     User newUserToUser(NewUser newUser);
 
     @Mapping(target = "image", source = "imageUrl")
     @Mapping(target = "token", ignore = true)
+    @Mapping(target = "username", source = "handle")
     com.conduit.openapi.model.User toUserDTO(User user);
 
     default <T> JsonNullable<T> toJsonNullable(T value) {
