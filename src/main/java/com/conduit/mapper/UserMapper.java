@@ -21,6 +21,8 @@ public interface UserMapper {
     @Mapping(target = "username", source = "handle")
     com.conduit.openapi.model.User toUserDTO(User user);
 
+
+
     default <T> JsonNullable<T> toJsonNullable(T value) {
         return value == null ? null : JsonNullable.of(value);
     }
