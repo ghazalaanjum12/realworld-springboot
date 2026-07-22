@@ -4,6 +4,7 @@ import com.conduit.mapper.UserMapper;
 import com.conduit.openapi.model.UpdateUser;
 import com.conduit.openapi.model.User;
 import com.conduit.repository.UserRepository;
+import io.micrometer.common.util.StringUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -19,6 +20,7 @@ public class UserService {
     private final UserMapper userMapper;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtService jwtService;
 
     public User getCurrentUser() {
         //Get something from Security Context
@@ -35,14 +37,20 @@ public class UserService {
         if (updateUser.getUsername() != null) user.setHandle(updateUser.getUsername());
         if (updateUser.getPassword() != null) user.setHashPassword(passwordEncoder.encode(updateUser.getPassword()));
         if (updateUser.getEmail() != null) user.setEmail(updateUser.getEmail());
-        if (updateUser.getBio().isPresent()) user.setBio(updateUser.getBio().get());
-        if (updateUser.getImage().isPresent()) user.setImageUrl(updateUser.getImage().get());
-
+        if (updateUser.getBio().isPresent()) {
+            String bio = updateUser.getBio().get();
+            bio = (bio == null || StringUtils.isBlank(bio)) ? null : bio;
+            user.setBio(bio);
+        }
+        if (updateUser.getImage().isPresent()) {
+            String image = updateUser.getImage().get();
+            image = (image == null || StringUtils.isBlank(image)) ? null : image;
+            user.setImageUrl(image);
+        }
         var savedUser = userRepository.save(user);
         var userDTO = userMapper.toUserDTO(savedUser);
-        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
-        String token = request.getHeader("Authorization").substring(6);
-        userDTO.setToken(token);
+        String newToken = jwtService.generateToken(user);
+        userDTO.setToken(newToken);
         return userDTO;
     }
 
