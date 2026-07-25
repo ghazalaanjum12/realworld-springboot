@@ -5,6 +5,7 @@ import com.conduit.openapi.model.GenericErrorModel;
 import io.jsonwebtoken.JwtException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -25,6 +26,18 @@ public class GlobalExceptionHandler {
     public ResponseEntity<GenericErrorModel> handleDuplicateIdException() {
         GenericErrorModel error = new GenericErrorModel(Map.of("email", List.of("Duplicate email exists")));
         return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
+    }
+
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<GenericErrorModel> handleBadCredentials() {
+        GenericErrorModel error = new GenericErrorModel(Map.of("body", List.of("Bad Credentials")));
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<GenericErrorModel> handleRequestValidationException(RequestValidationException exception){
+        GenericErrorModel error = new GenericErrorModel(exception.getFieldErrors());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
     }
 
 }
