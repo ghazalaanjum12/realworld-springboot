@@ -6,9 +6,11 @@ import com.conduit.mapper.UserMapper;
 import com.conduit.openapi.api.UsersApiDelegate;
 import com.conduit.openapi.model.CreateUserRequest;
 import com.conduit.openapi.model.LoginRequest;
+import com.conduit.openapi.model.LoginUser;
 import com.conduit.openapi.model.UserResponse;
 import com.conduit.service.LoginService;
 import com.conduit.service.RegistrationService;
+import com.conduit.validation.LoginUserValidator;
 import com.conduit.validation.NewUserValidator;
 import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.validation.Valid;
@@ -28,6 +30,7 @@ public class UsersApiDelegateImpl implements UsersApiDelegate {
     private final LoginService loginService;
     private final UserMapper userMapper;
     private final NewUserValidator userValidator;
+    private final LoginUserValidator loginUserValidator;
 
     @Override
     public ResponseEntity<UserResponse> createUser(CreateUserRequest createUserRequest) {
@@ -51,8 +54,14 @@ public class UsersApiDelegateImpl implements UsersApiDelegate {
     public ResponseEntity<UserResponse> login(
             @Parameter(name = "body", description = "Credentials to use", required = true) @Valid @RequestBody LoginRequest body
     ) {
+        var user = body.getUser();
+        BeanPropertyBindingResult errors = new BeanPropertyBindingResult(user,"loginUser");
+        loginUserValidator.validate(user,errors);
+        if(errors.hasErrors()){
+            throw new RequestValidationException(errors);
+        }
         UserResponse userResponse = new UserResponse();
-        UserResult result = loginService.authenticate(body.getUser());
+        UserResult result = loginService.authenticate(user);
         var userDTO = userMapper.toUserDTO(result.user());
         userDTO.setToken(result.token());
         userResponse.setUser(userDTO);

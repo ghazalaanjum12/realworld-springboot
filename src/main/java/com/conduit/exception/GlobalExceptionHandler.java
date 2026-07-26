@@ -31,7 +31,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<GenericErrorModel> handleBadCredentials() {
-        GenericErrorModel error = new GenericErrorModel(Map.of("body", List.of("Bad Credentials")));
+        GenericErrorModel error = new GenericErrorModel(Map.of("credentials", List.of("invalid")));
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
     }
 
