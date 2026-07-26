@@ -3,6 +3,7 @@ package com.conduit.exception;
 
 import com.conduit.openapi.model.GenericErrorModel;
 import io.jsonwebtoken.JwtException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -22,9 +23,9 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
     }
 
-    @ExceptionHandler(DuplicateIdException.class)
-    public ResponseEntity<GenericErrorModel> handleDuplicateIdException() {
-        GenericErrorModel error = new GenericErrorModel(Map.of("email", List.of("Duplicate email exists")));
+    @ExceptionHandler
+    public ResponseEntity<GenericErrorModel> handleDuplicateIdException(DuplicateUserException exception) {
+        GenericErrorModel error = new GenericErrorModel(exception.getFieldErrors());
         return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
     }
 
@@ -35,9 +36,15 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler
-    public ResponseEntity<GenericErrorModel> handleRequestValidationException(RequestValidationException exception){
+    public ResponseEntity<GenericErrorModel> handleRequestValidationException(RequestValidationException exception) {
         GenericErrorModel error = new GenericErrorModel(exception.getFieldErrors());
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(error);
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<GenericErrorModel> handleRequestValidationException() {
+        GenericErrorModel error = new GenericErrorModel(Map.of("body", List.of("Unknown error")));
+        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(error);
     }
 
 }
