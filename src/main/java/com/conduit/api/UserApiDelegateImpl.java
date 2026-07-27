@@ -1,10 +1,11 @@
 package com.conduit.api;
 
+import com.conduit.exception.RequestValidationException;
 import com.conduit.openapi.api.UserApiDelegate;
 import com.conduit.openapi.model.UpdateCurrentUserRequest;
 import com.conduit.openapi.model.UpdateUser;
 import com.conduit.openapi.model.UserResponse;
-import com.conduit.service.UpdateUserValidator;
+import com.conduit.validation.UpdateUserValidator;
 import com.conduit.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -35,7 +36,7 @@ public class UserApiDelegateImpl implements UserApiDelegate {
         BeanPropertyBindingResult errors = new BeanPropertyBindingResult(user, "updateUser");
         validator.validate(user, errors);
         if (errors.hasErrors()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+            throw new RequestValidationException(errors);
         }
         //Send it to the service to save it
         var userDTO = userService.updateUser(user);

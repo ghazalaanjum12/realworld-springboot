@@ -25,6 +25,9 @@ public class NewUserValidator implements Validator {
         if (StringUtils.isBlank(newUser.getPassword())) {
             errors.rejectValue("password", "field.required", "can't be blank");
         }
+        if(StringUtils.isNotBlank(newUser.getPassword()) && newUser.getPassword().length()<8){
+            errors.rejectValue("password","field.required", "should be greater than 8 characters");
+        }
 
     }
 }

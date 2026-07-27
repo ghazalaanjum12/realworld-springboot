@@ -12,6 +12,10 @@ public class RequestValidationException extends RuntimeException {
 
     public RequestValidationException(Errors errors) {
         super("Validation failed for object: " + errors.getObjectName());
+        if (errors.getFieldErrors() == null) {
+            this.fieldErrors = Map.of("all", List.of("there should be alteast one value present"));
+            return;
+        }
         this.fieldErrors = errors.getFieldErrors().stream().collect(Collectors.toMap(FieldError::getField, fe -> List.of(fe.getDefaultMessage())));
     }
 
