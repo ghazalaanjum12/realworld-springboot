@@ -47,4 +47,10 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(error);
     }
 
+    @ExceptionHandler(ProfileNotFoundException.class)
+    public ResponseEntity<GenericErrorModel> handleProfileNotFoundException() {
+        GenericErrorModel error = new GenericErrorModel(Map.of("profile", List.of("not found")));
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+    }
+
 }

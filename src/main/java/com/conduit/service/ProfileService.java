@@ -2,6 +2,7 @@ package com.conduit.service;
 
 import com.conduit.entity.Follow;
 import com.conduit.entity.User;
+import com.conduit.exception.ProfileNotFoundException;
 import com.conduit.openapi.model.Profile;
 import com.conduit.repository.FollowRepository;
 import com.conduit.repository.UserRepository;
@@ -19,9 +20,12 @@ public class ProfileService {
     private final AuthenticationFacade authenticationFacade;
 
     public Profile getProfileDetails(String username) {
-        User followedUser = userRepository.findByHandle(username).get();
+        Optional<User> followedUser = userRepository.findByHandle(username);
+        if (followedUser.isEmpty()) {
+            throw new ProfileNotFoundException(username + " not found!");
+        }
         Profile profile = new Profile();
-        fillProfile(profile, followedUser);
+        fillProfile(profile, followedUser.get());
         return profile;
     }
 
@@ -40,28 +44,34 @@ public class ProfileService {
     }
 
     public Profile followProfile(String username) {
-        User followedUser = userRepository.findByHandle(username).get();
-        User followerUser = authenticationFacade.getCurrentUser().get();
+        Optional<User> followedUser = userRepository.findByHandle(username);
+        if (followedUser.isEmpty()) {
+            throw new ProfileNotFoundException(username + " not found!");
+        }
+        Optional<User> followerUser = authenticationFacade.getCurrentUser();
 
-        Follow follow = new Follow(followerUser, followedUser);
+        Follow follow = new Follow(followerUser.get(), followedUser.get());
         followRepository.save(follow);
 
         Profile profile = new Profile();
-        fillProfile(profile, followedUser);
+        fillProfile(profile, followedUser.get());
         return profile;
 
 
     }
 
     public Profile unfollowProfile(String username) {
-        User followedUser = userRepository.findByHandle(username).get();
-        User followerUser = authenticationFacade.getCurrentUser().get();
+        Optional<User> followedUser = userRepository.findByHandle(username);
+        if (followedUser.isEmpty()) {
+            throw new ProfileNotFoundException(username + " not found!");
+        }
+        Optional<User> followerUser = authenticationFacade.getCurrentUser();
 
-        Optional<Follow> follow = followRepository.findByFollowerAndFollowed(followerUser, followedUser);
+        Optional<Follow> follow = followRepository.findByFollowerAndFollowed(followerUser.get(), followedUser.get());
         followRepository.delete(follow.get());
 
         Profile profile = new Profile();
-        fillProfile(profile, followedUser);
+        fillProfile(profile, followedUser.get());
         return profile;
 
     }
