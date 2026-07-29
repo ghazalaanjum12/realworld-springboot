@@ -39,17 +39,30 @@ public class ProfileService {
         }
     }
 
-    public Profile followProfile(String username){
+    public Profile followProfile(String username) {
         User followedUser = userRepository.findByHandle(username).get();
         User followerUser = authenticationFacade.getCurrentUser().get();
 
-        Follow follow = new Follow(followerUser,followedUser);
+        Follow follow = new Follow(followerUser, followedUser);
         followRepository.save(follow);
 
         Profile profile = new Profile();
         fillProfile(profile, followedUser);
         return profile;
 
+
+    }
+
+    public Profile unfollowProfile(String username) {
+        User followedUser = userRepository.findByHandle(username).get();
+        User followerUser = authenticationFacade.getCurrentUser().get();
+
+        Optional<Follow> follow = followRepository.findByFollowerAndFollowed(followerUser, followedUser);
+        followRepository.delete(follow.get());
+
+        Profile profile = new Profile();
+        fillProfile(profile, followedUser);
+        return profile;
 
     }
 }

@@ -1,6 +1,7 @@
 package com.conduit.api;
 
 import com.conduit.openapi.api.ProfilesApiDelegate;
+import com.conduit.openapi.model.Profile;
 import com.conduit.openapi.model.ProfileResponse;
 import com.conduit.service.ProfileService;
 import lombok.RequiredArgsConstructor;
@@ -20,8 +21,14 @@ public class ProfilesApiDelegateImpl implements ProfilesApiDelegate {
     }
 
     @Override
-    public ResponseEntity<ProfileResponse> followUserByUsername(String username){
+    public ResponseEntity<ProfileResponse> followUserByUsername(String username) {
         ProfileResponse profileResponse = new ProfileResponse(profileService.followProfile(username));
+        return ResponseEntity.ok(profileResponse);
+    }
+
+    @Override
+    public ResponseEntity<ProfileResponse> unfollowUserByUsername(String username) {
+        ProfileResponse profileResponse = new ProfileResponse(profileService.unfollowProfile(username));
         return ResponseEntity.ok(profileResponse);
     }
 }
