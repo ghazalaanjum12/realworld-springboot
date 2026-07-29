@@ -1,5 +1,6 @@
 package com.conduit.service;
 
+import com.conduit.entity.Follow;
 import com.conduit.entity.User;
 import com.conduit.openapi.model.Profile;
 import com.conduit.repository.FollowRepository;
@@ -20,6 +21,11 @@ public class ProfileService {
     public Profile getProfileDetails(String username) {
         User followedUser = userRepository.findByHandle(username).get();
         Profile profile = new Profile();
+        fillProfile(profile, followedUser);
+        return profile;
+    }
+
+    private void fillProfile(Profile profile, User followedUser) {
         profile.setUsername(followedUser.getHandle());
         profile.setBio(JsonNullable.of(followedUser.getBio()));
         profile.setImage(JsonNullable.of(followedUser.getImageUrl()));
@@ -31,6 +37,19 @@ public class ProfileService {
             boolean following = followRepository.existsByFollowerIdAndFollowedId(followerUser.get().getId(), followedUser.getId());
             profile.setFollowing(following);
         }
+    }
+
+    public Profile followProfile(String username){
+        User followedUser = userRepository.findByHandle(username).get();
+        User followerUser = authenticationFacade.getCurrentUser().get();
+
+        Follow follow = new Follow(followerUser,followedUser);
+        followRepository.save(follow);
+
+        Profile profile = new Profile();
+        fillProfile(profile, followedUser);
         return profile;
+
+
     }
 }

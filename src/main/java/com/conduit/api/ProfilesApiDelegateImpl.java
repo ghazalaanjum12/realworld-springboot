@@ -18,4 +18,10 @@ public class ProfilesApiDelegateImpl implements ProfilesApiDelegate {
         ProfileResponse profileResponse = new ProfileResponse(profileService.getProfileDetails(username));
         return ResponseEntity.ok(profileResponse);
     }
+
+    @Override
+    public ResponseEntity<ProfileResponse> followUserByUsername(String username){
+        ProfileResponse profileResponse = new ProfileResponse(profileService.followProfile(username));
+        return ResponseEntity.ok(profileResponse);
+    }
 }
